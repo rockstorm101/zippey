@@ -45,9 +45,20 @@ is base64 coded to ensure the entire file is text format.
 Before trying anthing, please remember to add the file filter by running the
 following command inside the directory you have cloned.
 
+First to add the smudge filter,
+
 >   git config filter.zippey.smudge "$PWD/zippey.py d"
+
+then the clean filter,
+
 >   git config filter.zippey.clean  "$PWD/zippey.py e"
 
-These two lines register the zippey filter to git. The .gitattributes file 
-has settings that enforce Microsoft Word docx file to use this filter.
+The .gitattributes file has settings that enforce Microsoft Word docx file to 
+use this filter. The only side-effect for this is that, if you download docx file
+directly online from an online repository host, the docx file can not be opened
+as it still in text format. If it is just a single file you can try
+
+>   zippey.py d < downloaded-file > recovered-file
+
+to recover it.
 
