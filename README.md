@@ -15,7 +15,9 @@ Zippey is a Git filter that un-zip zip-based file into a simple text format
 during git add/commit ("clean" process) and recover the original zip-based 
 file after git checkout ("smudge" process). Since diff is taken on the 
 "cleaned" file after file is added, it is likely real changes to file can be 
-reflected by original git diff command. 
+reflected by original git diff command. This also solves the problem that
+the diff results for these files being useless and not readable for 
+humanbeings.
 
 ## File Format
 
@@ -39,5 +41,13 @@ There are two types of data section. If the file contains only text data,
 its content is copied to data section without any change, otherwise, data 
 is base64 coded to ensure the entire file is text format.
 
+## Try Out
+Before trying anthing, please remember to add the file filter by running the
+following command inside the directory you have cloned.
 
+>   git config filter.zippey.smudge "$PWD/zippey.py d"
+>   git config filter.zippey.clean  "$PWD/zippey.py e"
+
+These two lines register the zippey filter to git. The .gitattributes file 
+has settings that enforce Microsoft Word docx file to use this filter.
 
