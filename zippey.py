@@ -151,7 +151,10 @@ elif sys.argv[1]=='d':
             file.writestr(name.rstrip(), base64.b64decode(inputt.read(data_len)));
             inputt.read(1);
         else:
-            pass  # actually something is extremely wrong here.
+            # something is extremely wrong here.
+            file.close();
+            fp.close();
+            sys.exit(1);
     
     # flush all write 
     file.close();
