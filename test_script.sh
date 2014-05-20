@@ -3,7 +3,7 @@
 python zippey.py e < winword.docx > winword.plain
 python zippey.py d < winword.plain > winword_new.docx
 
-
+[ -e "tmp" ] && rm -rf tmp
 mkdir -p tmp/winword
 mkdir -p tmp/winword_new
 
