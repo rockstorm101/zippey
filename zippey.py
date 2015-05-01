@@ -74,6 +74,9 @@
 #  to make python 3 compatible
 #  Date May 20th 2014
 #
+#  Modified 2015-04-30 by jpnp to detect an already zipped file
+#     when decoding
+#
 
 import zipfile
 import sys
@@ -82,6 +85,7 @@ import base64
 import string
 import tempfile
 import os.path
+import shutil
 
 DEBUG_ZIPPEY = False
 NAME = 'Zippey'
@@ -145,6 +149,13 @@ def encode(input, output):
 def decode(input, output):
     '''Decode from special VCS friendly format from input to output'''
     debug("DECODE was called")
+
+    # Check whether already zipped
+    if (input.peek(4)[0:4] == b'PK\003\004'):
+        debug("Already zipped - copying directly")
+        shutil.copyfileobj(input, output)
+        return
+
     tfp = tempfile.TemporaryFile(mode='w+b')
     zfp = zipfile.ZipFile(tfp, "w", zipfile.ZIP_DEFLATED)
 
