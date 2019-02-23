@@ -196,7 +196,11 @@ def main():
     output = io.open(sys.stdout.fileno(), 'wb')
 
     if len(sys.argv) < 2 or sys.argv[1] == '-' or sys.argv[1] == '--help':
-        sys.stdout.write("{}\nTo encode: 'python zippey.py e'\nTo decode: 'python zippey.py d'\nAll files read from stdin and printed to stdout\n".format(NAME))
+        sys.stdout.write(("{}\n"
+                "To encode: 'python zippey.py e'\n"
+                "To decode: 'python zippey.py d'\n"
+                "All files read from stdin and printed to stdout\n")
+                .format(NAME))
     elif sys.argv[1] == 'e':
         encode(input, output)
     elif sys.argv[1] == 'd':
