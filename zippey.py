@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#  Copyright (c) 2014, Sippey Fun Lab
+#  Copyright (c) 2014 - 2019, Sippey Fun Lab <sippey@gmail.com>
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -33,16 +33,6 @@
 # Zippey is a Git filter for friendly handling of ZIP-based files.
 # This is the main source file.
 # See the README for further details.
-#
-# Author: Sippey (sippey@gmail.com)
-# Date: Apr.18, 2014
-#
-# Modified by Kristian Hoey Horsberg <khh1990 ' at ' gmail.com>
-# to make python 3 compatible
-# Date May 20th 2014
-#
-#  Modified 2015-04-30 by jpnp to detect an already zipped file
-#     when decoding
 #
 
 import zipfile
