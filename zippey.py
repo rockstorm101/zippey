@@ -78,7 +78,7 @@ def init():
         msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
 
 def encode(input, output):
-    '''Encode into special VCS friendly format from input to output'''
+    '''Encode into special VCS friendly format from input (application/zip) to output (text/plain)'''
     debug("ENCODE was called")
     tfp = tempfile.TemporaryFile(mode='w+b')
     tfp.write(input.read())
@@ -114,7 +114,7 @@ def encode(input, output):
     tfp.close()
 
 def decode(input, output):
-    '''Decode from special VCS friendly format from input to output'''
+    '''Decode from special VCS friendly format from input (text/plain) to output (application/zip)'''
     debug("DECODE was called")
 
     # Check whether already zipped
