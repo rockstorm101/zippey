@@ -31,7 +31,8 @@
 
 #
 # Zippey is a Git filter for friendly handling of ZIP-based files.
-# See the README for a more elaborate description.
+# This is the main source file.
+# See the README for further details.
 #
 # Author: Sippey (sippey@gmail.com)
 # Date: Apr.18, 2014
