@@ -140,3 +140,10 @@ __Workaround:__ If it is just a single file, you can recover it by:
 
         python zippey.py d < downloaded-text-file > recovered-zip-based-file
 
+## Unit-Tests
+
+These check basic validy of the code as is.
+Run like this:
+
+    python test_zippey.py
+
