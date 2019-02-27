@@ -119,6 +119,11 @@ that enforces Microsoft Word files to use this filter:
 
     *.docx filter=zippey
 
+## License
+
+This project is licensed under the BSD 3-clause "New"
+or "Revised" license (bsd-3-clause).
+
 ## Side-effects
 
 In the repository, the file is _not_ saved as an archive,
