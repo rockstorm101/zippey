@@ -76,6 +76,14 @@ class TestZippey(unittest.TestCase):
             # Encode the ZIP file into a text format
             zippey.encode(io.open(file_orig,  "rb"),    open(file_encoded, 'w'))
             
+            # Check if file content appears in the encoded format.
+            # This is important to be bale to see changes
+            # in archived files in the git history.
+            for cont_file in self.content:
+                self.assertTrue(
+                        open(cont_file).read() in open(file_encoded).read(),
+                        "Can not find file contents of '{0}' in encoded archive!".format(cont_file))
+            
             # Decode back into a ZIP file
             zippey.decode(io.open(file_encoded,  "rb"), open(file_decoded, 'w'))
             
