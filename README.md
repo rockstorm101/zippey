@@ -114,7 +114,7 @@ Now we still need to enable the filter,
 which is best done by adding a `.gitattributes` file to each repository
 in which you want to use this filter.
 
-Here sample content of a `.gitattributes` file
+This is sample content of a `.gitattributes` file
 that enforces Microsoft Word files to use this filter:
 
     *.docx filter=zippey
