@@ -78,7 +78,7 @@ class TestZippey(unittest.TestCase):
             self.create_zip_file(file_orig)
             
             # Encode the ZIP file into a text format
-            zippey.encode(io.open(file_orig,  "rb"),    open(file_encoded, 'w'))
+            zippey.encode(io.open(file_orig, 'rb'), open(file_encoded, 'wb'))
             
             # Check if file content appears in the encoded format.
             # This is important to be bale to see changes
@@ -89,7 +89,7 @@ class TestZippey(unittest.TestCase):
                         "Can not find file contents of '{0}' in encoded archive!".format(cont_file))
             
             # Decode back into a ZIP file
-            zippey.decode(io.open(file_encoded,  "rb"), open(file_decoded, 'w'))
+            zippey.decode(io.open(file_encoded, 'rb'), open(file_decoded, 'wb'))
             
             # Unzip our re-decoded ZIP file
             os.mkdir(dir_unzipped)
