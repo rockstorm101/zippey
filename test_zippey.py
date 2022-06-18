@@ -48,34 +48,37 @@ import filecmp
 import shutil
 import zippey
 
+
+def create_temp_dir():
+    return tempfile.mkdtemp(prefix="test_zippey_")
+
+
+def create_zip_file(file_path, file_list):
+    with zipfile.ZipFile(file_path, 'w', zipfile.ZIP_DEFLATED) as zfp:
+        for cont_file in file_list:
+            zfp.write(cont_file.rstrip(), cont_file)
+
+
+def unzip(zip_file_path, dst_dir):
+    with zipfile.ZipFile(zip_file_path, 'r') as zfp:
+        zfp.extractall(dst_dir)
+
+
 class TestZippey(unittest.TestCase):
 
     content = ["zippey.py",  "test_zippey.py",  "README.md"]
 
-    def create_temp_dir(self):
-        return tempfile.mkdtemp(prefix = 'test_zippey_')
-
-    def create_zip_file(self,  file_path):
-        zfp = zipfile.ZipFile(file_path, "w", zipfile.ZIP_DEFLATED)
-        for cont_file in self.content:
-            zfp.write(cont_file.rstrip(), cont_file)
-        zfp.close()
-
-    def unzip(self,  zip_file_path,  dst_dir):
-        zfp = zipfile.ZipFile(zip_file_path, 'r')
-        zfp.extractall(dst_dir)
-        zfp.close()
 
     def test_encode_decode_content_comparison_with_original(self):
         try:
-            temp_dir = self.create_temp_dir()
+            temp_dir = create_temp_dir()
             file_orig = os.path.join(temp_dir, "orig.zip")
             file_encoded = os.path.join(temp_dir, "encoded.txt")
             file_decoded = os.path.join(temp_dir, "decoded.zip")
             dir_unzipped = os.path.join(temp_dir, "unzipped")
 
             # Create a simple ZIP file containing this repos text files
-            self.create_zip_file(file_orig)
+            create_zip_file(file_orig, self.content)
 
             # Encode the ZIP file into a text format
             zippey.encode(io.open(file_orig, 'rb'), open(file_encoded, 'wb'))
@@ -93,7 +96,7 @@ class TestZippey(unittest.TestCase):
 
             # Unzip our re-decoded ZIP file
             os.mkdir(dir_unzipped)
-            self.unzip(file_decoded,  dir_unzipped)
+            unzip(file_decoded,  dir_unzipped)
 
             # Compare the re-decoded ZIP contents with the original text files
             for cont_file in self.content:
