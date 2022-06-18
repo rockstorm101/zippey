@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-
-#  Copyright (c) 2014, Sippey Fun Lab
+#
+#  Copyright (c) 2014 - 2019, Sippey Fun Lab <sippey@gmail.com>
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -20,7 +20,7 @@
 #  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 #  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 #  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-#  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
+#  DISCLAIMED. IN NO EVENT SHALL Sippey Fun Lab BE LIABLE FOR ANY
 #  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 #  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 #  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -28,51 +28,13 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+# This is the BSD 3-clause "New" or "Revised" license (bsd-3-clause).
+#
 
-
 #
-#  Zippey: A Git filter for friendly handling of ZIP-based files
-#
-#  There are many types of ZIP-based files, such as  Microsoft Office .docx,
-#  .xlsx, .pptx files, OpenOffice .odt files and jar files, that contains
-#  plaintext content but not really tractable by git due to compression smears
-#  parts that have been modified and parts that remain the same across commit.
-#  This prevent Git from versioning these files and treat them as a new binary
-#  blob every time the file is saved.
-#
-#  Zippey is a Git filter that un-zip zip-based file into a simple text format
-#  during git add/commit ("clean" process) and recover the original zip-based
-#  file after git checkout ("smudge" process). Since diff is taken on the
-#  "cleaned" file after file is added, it is likely real changes to file can be
-#  reflected by original git diff command.
-#
-#  The text format is defined as a series of records. Each records represent a
-#  file in the original zip-based file, which is composed of two parts,
-#  a header that contains meta file and a body that contains data. The header
-#  is a few data fields segmented by pipe character like this:
-#
-#       length|raw_length|type|filename
-#
-#  where length is an ascii coded integer of the following data section, raw_length
-#  is the orginal length of data (if transformation is taken), type can be A for
-#  text data or B for binary data, and filename is the original file name
-#  including path if the zip-based file contains directories. Immediately after
-#  the header, there is a carriage return ('\n'), follows "length" byte of
-#  data, and then another CR and then the next recor, i,e,
-#
-#       [header1]\n[data1]\n[header2]\n[data2] ...
-#
-#  There are two types of data section. If the file contains only text data,
-#  its content is copied to data section without any change, otherwise, data
-#  is base64 coded to ensure the entire file is text format.
-#
-#
-#  Author: Sippey (sippey@gmail.com)
-#  Date: Apr.18, 2014
-#
-#  Modified by Kristian Hoey Horsberg <khh1990 ' at ' gmail.com>
-#  to make python 3 compatible
-#  Date May 20th 2014
+# Zippey is a Git filter for friendly handling of ZIP-based files.
+# This is the main source file.
+# See the README for further details.
 #
 
 import zipfile
@@ -82,6 +44,7 @@ import base64
 import string
 import tempfile
 import os.path
+import shutil
 
 DEBUG_ZIPPEY = False
 NAME = 'Zippey'
@@ -107,7 +70,7 @@ def init():
         msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
 
 def encode(input, output):
-    '''Encode into special VCS friendly format from input to output'''
+    '''Encode into special VCS friendly format from input (application/zip) to output (text/plain)'''
     debug("ENCODE was called")
     tfp = tempfile.TemporaryFile(mode='w+b')
     tfp.write(input.read())
@@ -143,8 +106,15 @@ def encode(input, output):
     tfp.close()
 
 def decode(input, output):
-    '''Decode from special VCS friendly format from input to output'''
+    '''Decode from special VCS friendly format from input (text/plain) to output (application/zip)'''
     debug("DECODE was called")
+
+    # Check whether already zipped
+    if (input.peek(4)[0:4] == b'PK\003\004'):
+        debug("Already zipped - copying directly")
+        shutil.copyfileobj(input, output)
+        return
+
     tfp = tempfile.TemporaryFile(mode='w+b')
     zfp = zipfile.ZipFile(tfp, "w", zipfile.ZIP_DEFLATED)
 
@@ -185,7 +155,11 @@ def main():
     output = io.open(sys.stdout.fileno(), 'wb')
 
     if len(sys.argv) < 2 or sys.argv[1] == '-' or sys.argv[1] == '--help':
-        sys.stdout.write("{}\nTo encode: 'python zippey.py e'\nTo decode: 'python zippey.py d'\nAll files read from stdin and printed to stdout\n".format(NAME))
+        sys.stdout.write(("{}\n"
+                "To encode: 'python zippey.py e'\n"
+                "To decode: 'python zippey.py d'\n"
+                "All files read from stdin and printed to stdout\n")
+                .format(NAME))
     elif sys.argv[1] == 'e':
         encode(input, output)
     elif sys.argv[1] == 'd':
