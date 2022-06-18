@@ -37,6 +37,7 @@
 # See the README for further details.
 #
 
+import argparse
 import zipfile
 import sys
 import io
@@ -147,26 +148,51 @@ def decode(input, output):
     output.write(tfp.read())
     tfp.close()
 
+
+def parse_args():
+    # main parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help="show debug info")
+    command_parsers = parser.add_subparsers(required=True,
+                                            metavar="command")
+
+    # encode command parser
+    e_desc = "Files are read from stdin and printed to stdout."
+    e_parser = command_parsers.add_parser('encode', aliases=['e'],
+                                          help="encode from ZIP to text",
+                                          description=e_desc)
+    e_parser.set_defaults(func='e')
+
+    # decode command parser
+    d_parser = command_parsers.add_parser('decode', aliases=['d'],
+                                          help="decode from text to ZIP",
+                                          description=e_desc)
+    d_parser.set_defaults(func='d')
+
+    return parser.parse_args()
+
+
 def main():
     '''Main program'''
+    args = parse_args()
+
+    # main parser actions
+    if args.verbose:
+        global DEBUG_ZIPPEY
+        DEBUG_ZIPPEY = True
+
     init()
 
     input = io.open(sys.stdin.fileno(), 'rb')
     output = io.open(sys.stdout.fileno(), 'wb')
 
-    if len(sys.argv) < 2 or sys.argv[1] == '-' or sys.argv[1] == '--help':
-        sys.stdout.write(("{}\n"
-                "To encode: 'python zippey.py e'\n"
-                "To decode: 'python zippey.py d'\n"
-                "All files read from stdin and printed to stdout\n")
-                .format(NAME))
-    elif sys.argv[1] == 'e':
+    # command switch
+    if args.func == 'e':
         encode(input, output)
-    elif sys.argv[1] == 'd':
+    elif args.func == 'd':
         decode(input, output)
-    else:
-        error("Illegal argument '{}'. Try --help for more information".format(sys.argv[1]))
-        sys.exit(1)
+
 
 if __name__ == '__main__':
     main()
