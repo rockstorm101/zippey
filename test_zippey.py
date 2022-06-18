@@ -68,7 +68,6 @@ class TestZippey(unittest.TestCase):
 
     content = ["zippey.py",  "test_zippey.py",  "README.md"]
 
-
     def test_encode_decode_content_comparison_with_original(self):
         try:
             temp_dir = create_temp_dir()
@@ -81,18 +80,24 @@ class TestZippey(unittest.TestCase):
             create_zip_file(file_orig, self.content)
 
             # Encode the ZIP file into a text format
-            zippey.encode(io.open(file_orig, 'rb'), open(file_encoded, 'wb'))
+            with io.open(file_orig, 'rb') as zip_file:
+                with open(file_encoded, 'wb') as text_file:
+                    zippey.encode(zip_file, text_file)
 
             # Check if file content appears in the encoded format.
             # This is important to be bale to see changes
             # in archived files in the git history.
             for cont_file in self.content:
-                self.assertTrue(
-                        open(cont_file).read() in open(file_encoded).read(),
-                        "Can not find file contents of '{0}' in encoded archive!".format(cont_file))
+                msg = (f"Can not find file contents of '{cont_file}'"
+                       f"in encoded archive!")
+                with open(cont_file) as orig_file:
+                    with open(file_encoded) as encoded_file:
+                        self.assertTrue(orig_file.read() in encoded_file.read(), msg)
 
             # Decode back into a ZIP file
-            zippey.decode(io.open(file_encoded, 'rb'), open(file_decoded, 'wb'))
+            with io.open(file_encoded, 'rb') as text_file:
+                with open(file_decoded, 'wb') as zip_file:
+                    zippey.decode(text_file, zip_file)
 
             # Unzip our re-decoded ZIP file
             os.mkdir(dir_unzipped)
