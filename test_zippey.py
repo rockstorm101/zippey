@@ -66,53 +66,57 @@ def unzip(zip_file_path, dst_dir):
 
 class TestZippey(unittest.TestCase):
 
-    content = ["zippey.py",  "test_zippey.py",  "README.md"]
+    @classmethod
+    def setUpClass(self):
+        self.content = ["zippey.py",  "test_zippey.py",  "README.md"]
+        self.temp_dir = create_temp_dir()
 
     def test_encode_decode_content_comparison_with_original(self):
-        try:
-            temp_dir = create_temp_dir()
-            file_orig = os.path.join(temp_dir, "orig.zip")
-            file_encoded = os.path.join(temp_dir, "encoded.txt")
-            file_decoded = os.path.join(temp_dir, "decoded.zip")
-            dir_unzipped = os.path.join(temp_dir, "unzipped")
+        file_orig = os.path.join(self.temp_dir, "orig.zip")
+        file_encoded = os.path.join(self.temp_dir, "encoded.txt")
+        file_decoded = os.path.join(self.temp_dir, "decoded.zip")
+        dir_unzipped = os.path.join(self.temp_dir, "unzipped")
 
-            # Create a simple ZIP file containing this repos text files
-            create_zip_file(file_orig, self.content)
+        # Create a simple ZIP file containing this repos text files
+        create_zip_file(file_orig, self.content)
 
-            # Encode the ZIP file into a text format
-            with io.open(file_orig, 'rb') as zip_file:
-                with open(file_encoded, 'wb') as text_file:
-                    zippey.encode(zip_file, text_file)
+        # Encode the ZIP file into a text format
+        with io.open(file_orig, 'rb') as zip_file:
+            with open(file_encoded, 'wb') as text_file:
+                zippey.encode(zip_file, text_file)
 
-            # Check if file content appears in the encoded format.
-            # This is important to be bale to see changes
-            # in archived files in the git history.
-            for cont_file in self.content:
-                msg = (f"Can not find file contents of '{cont_file}'"
-                       f"in encoded archive!")
-                with open(cont_file) as orig_file:
-                    with open(file_encoded) as encoded_file:
-                        self.assertTrue(orig_file.read() in encoded_file.read(), msg)
+        # Check if file content appears in the encoded format.
+        # This is important to be able to see changes
+        # in archived files in the git history.
+        for cont_file in self.content:
+            msg = (f"Can not find file contents of '{cont_file}'"
+                   f"in encoded archive!")
+            with open(cont_file) as orig_file:
+                with open(file_encoded) as encoded_file:
+                    self.assertTrue(orig_file.read() in encoded_file.read(),
+                                    msg)
 
-            # Decode back into a ZIP file
-            with io.open(file_encoded, 'rb') as text_file:
-                with open(file_decoded, 'wb') as zip_file:
-                    zippey.decode(text_file, zip_file)
+        # Decode back into a ZIP file
+        with io.open(file_encoded, 'rb') as text_file:
+            with open(file_decoded, 'wb') as zip_file:
+                zippey.decode(text_file, zip_file)
 
-            # Unzip our re-decoded ZIP file
-            os.mkdir(dir_unzipped)
-            unzip(file_decoded,  dir_unzipped)
+        # Unzip our re-decoded ZIP file
+        os.mkdir(dir_unzipped)
+        unzip(file_decoded,  dir_unzipped)
 
-            # Compare the re-decoded ZIP contents with the original text files
-            for cont_file in self.content:
-                self.assertTrue(
-                        filecmp.cmp(
-                                os.path.join(dir_unzipped, cont_file),
-                                cont_file,
-                                shallow = False),
-                        "File contents of '{0}' differ!".format(cont_file))
-        finally:
-            shutil.rmtree(temp_dir)
+        # Compare the re-decoded ZIP contents with the original text files
+        for cont_file in self.content:
+            self.assertTrue(
+                filecmp.cmp(
+                    os.path.join(dir_unzipped, cont_file),
+                    cont_file,
+                    shallow=False),
+                "File contents of '{0}' differ!".format(cont_file))
+
+    @classmethod
+    def tearDownClass(self):
+        shutil.rmtree(self.temp_dir)
 
 if __name__ == '__main__':
     unittest.main()
