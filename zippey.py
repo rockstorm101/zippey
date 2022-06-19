@@ -169,12 +169,12 @@ def install(args):
 
     # Install the add/commit filter
     subprocess.run(
-        config_cmd + ["filter.zipfilter.clean", "zippey.py -v e"],
+        config_cmd + ["filter.zipfilter.clean", "zippey.py e"],
         check=True)
 
     # Install the checkout filter
     subprocess.run(
-        config_cmd + ["filter.zipfilter.smudge", "zippey.py -v d"],
+        config_cmd + ["filter.zipfilter.smudge", "zippey.py d"],
         check=True)
 
     # Install the diff filter
