@@ -214,6 +214,34 @@ def _install_attributes(args):
             tmp_file.write(f"*.{ext:8}  filter=zipfilter  {diff_filter}\n")
 
 
+def textconv(args):
+    '''Summarise files and sizes within a ZIP file'''
+    debug("Textconv was called")
+
+    if not zipfile.is_zipfile(args.file_):
+        error(f"File '{args.file_}' is not a ZIP file")
+        sys.exit(1)
+
+    name_len = 30
+    size_len = 10
+    lines = [f"{'File Name':^{name_len}}  {'Size':^{size_len}}"]
+    lines.append(f"{'-':->{name_len}}  {'-':-<{size_len}}")
+
+    with zipfile.ZipFile(args.file_) as zfile:
+        for item in zfile.infolist():
+            name = item.filename
+            if len(name) > name_len:
+                sname = ('...' + name[len(name)-name_len+3:])
+            else:
+                sname = name
+                lines.append(f"{sname:>{name_len}}  "
+                             f"{item.file_size:{size_len}}")
+
+    with io.open(sys.stdout.fileno(), 'w') as output:
+        for line in lines:
+            output.write(f"{line}\n")
+
+
 def parse_args():
     '''Parse command line arguments'''
 
@@ -251,6 +279,13 @@ def parse_args():
                                    'jar',
                                    'FCStd'])
     i_parser.set_defaults(func=install)
+
+    # textconv command parser
+    textconv_help = "convert to content list suitable for diff-ing"
+    t_parser = command_parsers.add_parser('textconv', help=textconv_help)
+    t_parser.add_argument('file_', metavar='FILE',
+                          help="ZIP file to print information from")
+    t_parser.set_defaults(func=textconv)
 
     return parser.parse_args()
 
