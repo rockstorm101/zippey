@@ -79,8 +79,8 @@ def encode(input, output):
     zfp = zipfile.ZipFile(tfp, "r")
     for name in zfp.namelist():
         data = zfp.read(name)
-        text_extentions = ['.txt', '.html', '.xml']
-        extention = os.path.splitext(name)[1][1:].strip().lower()
+        text_extensions = ['.txt', '.html', '.xml']
+        extension = os.path.splitext(name)[1][1:].strip().lower()
         try:
             # Check if text data
             data.decode(ENCODING)
@@ -88,7 +88,7 @@ def encode(input, output):
                 strdata = map(chr, data)
             except TypeError:
                 strdata = data
-            if extention not in text_extentions and not all(c in string.printable for c in strdata):
+            if extension not in text_extensions and not all(c in string.printable for c in strdata):
                 raise UnicodeDecodeError(ENCODING, "".encode(ENCODING), 0, 1, "Artificial exception")
 
             # Encode
