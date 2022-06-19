@@ -237,7 +237,7 @@ def textconv(args):
                 lines.append(f"{sname:>{name_len}}  "
                              f"{item.file_size:{size_len}}")
 
-    with io.open(sys.stdout.fileno(), 'w') as output:
+    with open(args.output, 'w') as output:
         for line in lines:
             output.write(f"{line}\n")
 
@@ -301,15 +301,16 @@ def main():
 
     init()
 
-    input = io.open(sys.stdin.fileno(), 'rb')
-    output = io.open(sys.stdout.fileno(), 'wb')
-
     # command switch
-    if args.func == 'e':
-        encode(input, output)
-    elif args.func == 'd':
-        decode(input, output)
+    if args.func in ['e', 'd']:
+        with io.open(sys.stdin.fileno(), 'rb') as in_stream,\
+             io.open(sys.stdout.fileno(), 'wb') as out_stream:
+            if args.func == 'e':
+                encode(in_stream, out_stream)
+            elif args.func == 'd':
+                decode(in_stream, out_stream)
     else:
+        args.output = sys.stdout.fileno()
         args.func(args)
 
 
