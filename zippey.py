@@ -181,7 +181,7 @@ def install(args):
     if args.diff:
         debug("Installing diff filters")
         subprocess.run(
-            config_cmd + ["diff.zipfilter.textconv", "zippey.py textconv"],
+            config_cmd + ["diff.zipfilter.textconv", "zippey.py list"],
             check=True)
 
     _install_attributes(args)
@@ -214,9 +214,9 @@ def _install_attributes(args):
             tmp_file.write(f"*.{ext:8}  filter=zipfilter  {diff_filter}\n")
 
 
-def textconv(args):
+def size_list(args):
     '''Summarise files and sizes within a ZIP file'''
-    debug("Textconv was called")
+    debug("List was called")
 
     if not zipfile.is_zipfile(args.file_):
         error(f"File '{args.file_}' is not a ZIP file")
@@ -280,12 +280,12 @@ def parse_args():
                                    'FCStd'])
     i_parser.set_defaults(func=install)
 
-    # textconv command parser
-    textconv_help = "convert to content list suitable for diff-ing"
-    t_parser = command_parsers.add_parser('textconv', help=textconv_help)
-    t_parser.add_argument('file_', metavar='FILE',
+    # list command parser
+    list_help = "list ZIP contents sizes (suitable for simple diff-ing)"
+    l_parser = command_parsers.add_parser('list', help=list_help)
+    l_parser.add_argument('file_', metavar='FILE',
                           help="ZIP file to print information from")
-    t_parser.set_defaults(func=textconv)
+    l_parser.set_defaults(func=size_list)
 
     return parser.parse_args()
 
